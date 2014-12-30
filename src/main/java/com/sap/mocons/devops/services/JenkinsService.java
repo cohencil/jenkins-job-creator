@@ -1,19 +1,19 @@
 package com.sap.mocons.devops.services;
 
+import java.util.List;
 import java.util.Map;
 
 import com.offbytwo.jenkins.model.Job;
-import com.offbytwo.jenkins.model.JobWithDetails;
+import com.sap.mocons.devops.domain.Cookbook;
 
 public interface JenkinsService {
 
 	void createJob(String jobName, String jobXml);
 
+	void createJobs(List<Cookbook> cookbooks);
+
 	Map<String, Job> getJobs();
 
-	JobWithDetails getJob(String name);
+	String getConfigXML();
 
-	public abstract String getConfigXML();
-
-	public abstract void setGitRepositoryUrl(String gitUrl);
 }

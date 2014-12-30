@@ -2,6 +2,7 @@ package com.sap.mocons.devops.services.impl;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Document;
@@ -10,7 +11,7 @@ import org.dom4j.io.SAXReader;
 
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.Job;
-import com.offbytwo.jenkins.model.JobWithDetails;
+import com.sap.mocons.devops.domain.Cookbook;
 import com.sap.mocons.devops.services.JenkinsService;
 
 public class JenkinsServiceOffbytwoImpl implements JenkinsService {
@@ -43,6 +44,28 @@ public class JenkinsServiceOffbytwoImpl implements JenkinsService {
 	}
 
 	@Override
+	public void createJobs(List<Cookbook> cookbooks) {
+		int newJobsCounter = 0;
+		Map<String, Job> jobs = getJobs();
+
+		for (Cookbook cookbook : cookbooks) {
+			String jobName = cookbook.getName();
+			if (!jobs.keySet().contains(jobName)) {
+				// add non-existing jobs
+				System.out.println(String.format("adding new jenkins job: %s", cookbook));
+
+				setGitRepositoryUrl(cookbook.getGitRepositoryUrl());
+				createJob(jobName, getConfigXML());
+				newJobsCounter++;
+
+				System.out.println(String.format("new job was added to jenkins: %s", jobName));
+			}
+		}
+
+		System.out.println(String.format("%d new jobs were added to jenkins", newJobsCounter));
+	}
+
+	@Override
 	public Map<String, Job> getJobs() {
 		Map<String, Job> jobs = null;
 
@@ -56,25 +79,11 @@ public class JenkinsServiceOffbytwoImpl implements JenkinsService {
 	}
 
 	@Override
-	public JobWithDetails getJob(String name) {
-		JobWithDetails job = null;
-
-		try {
-			job = jenkinsServer.getJob(name);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return job;
-	}
-
-	@Override
 	public String getConfigXML() {
 		return doc.asXML();
 	}
 
-	@Override
-	public void setGitRepositoryUrl(String gitUrl) {
+	private void setGitRepositoryUrl(String gitUrl) {
 		Node node = doc.selectSingleNode("//hudson.plugins.git.UserRemoteConfig/url");
 		node.setText(gitUrl);
 	}
