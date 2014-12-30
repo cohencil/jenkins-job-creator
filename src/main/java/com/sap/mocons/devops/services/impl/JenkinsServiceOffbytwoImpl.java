@@ -15,9 +15,9 @@ import com.sap.mocons.devops.services.JenkinsService;
 
 public class JenkinsServiceOffbytwoImpl implements JenkinsService {
 
-	private static final String SERVER_URL = "http://mo-ed6c8e4cd.mo.sap.corp:8080/jenkins/";
-	private static final String USERNAME = "c5213938";
-	private static final String TOKEN = "b5c44f6fedb2c98d95d7efb656696599";
+	private static final String SERVER_URL = "http://mo-26ab3d335.mo.sap.corp:8080/jenkins/";
+	private static final String USERNAME = "asa1_mocons1";
+	private static final String TOKEN = "1f3a52012d2c86baadf1af8658ae02e5";
 
 	private JenkinsServer jenkinsServer;
 	private Document doc;

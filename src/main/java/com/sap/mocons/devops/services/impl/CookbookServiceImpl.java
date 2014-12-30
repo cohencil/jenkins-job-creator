@@ -32,7 +32,6 @@ public class CookbookServiceImpl implements CookbookService {
 			if (url != null && !url.isEmpty()) {
 				System.out.println(String.format("process repository '%s': %s", cookbook.getName(), url));
 				if (isQualified(url)) {
-					cookbook.setGitRepositoryUrl(url.replaceFirst("http:|https:", "git:").concat(".git"));
 					qualifiedCookbooks.add(cookbook);
 				}
 			}

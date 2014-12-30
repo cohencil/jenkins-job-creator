@@ -100,6 +100,9 @@ public class Cookbook {
 
 	public void setExternal_url(String external_url) {
 		this.external_url = external_url;
+		if (external_url != null && !external_url.isEmpty()) {
+			setGitRepositoryUrl(external_url.replaceFirst("http:|https:", "git:").concat(".git"));
+		}
 	}
 
 	public String getGit_url() {
