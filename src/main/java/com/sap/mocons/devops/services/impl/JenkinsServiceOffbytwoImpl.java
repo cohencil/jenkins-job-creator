@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
@@ -15,6 +16,8 @@ import com.sap.mocons.devops.domain.Cookbook;
 import com.sap.mocons.devops.services.JenkinsService;
 
 public class JenkinsServiceOffbytwoImpl implements JenkinsService {
+
+	private static Logger LOGGER = Logger.getLogger(JenkinsServiceOffbytwoImpl.class);
 
 	private static final String SERVER_URL = "http://mo-26ab3d335.mo.sap.corp:8080/jenkins/";
 	private static final String USERNAME = "asa1_mocons1";
@@ -39,7 +42,7 @@ public class JenkinsServiceOffbytwoImpl implements JenkinsService {
 		try {
 			jenkinsServer.createJob(jobName, jobXml);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(String.format("failed to create job '%s'", jobName), e);
 		}
 	}
 
@@ -52,17 +55,17 @@ public class JenkinsServiceOffbytwoImpl implements JenkinsService {
 			String jobName = cookbook.getName();
 			if (!jobs.keySet().contains(jobName)) {
 				// add non-existing jobs
-				System.out.println(String.format("adding new jenkins job: %s", cookbook));
+				LOGGER.info(String.format("adding new jenkins job: %s", cookbook));
 
 				setGitRepositoryUrl(cookbook.getGitRepositoryUrl());
 				createJob(jobName, getConfigXML());
 				newJobsCounter++;
 
-				System.out.println(String.format("new job was added to jenkins: %s", jobName));
+				LOGGER.info(String.format("new job was added to jenkins: %s", jobName));
 			}
 		}
 
-		System.out.println(String.format("%d new jobs were added to jenkins", newJobsCounter));
+		LOGGER.info(String.format("%d new jobs were added to jenkins", newJobsCounter));
 	}
 
 	@Override
@@ -72,7 +75,7 @@ public class JenkinsServiceOffbytwoImpl implements JenkinsService {
 		try {
 			jobs = jenkinsServer.getJobs();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("failed to get jobs", e);
 		}
 
 		return jobs;
