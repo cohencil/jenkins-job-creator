@@ -16,12 +16,23 @@ public class ServiceManager {
 		try {
 			LOGGER.info("Jenkins job provision - Start");
 
-			// TODO externalize shelf url
-			CookbookService cookbookService = new CookbookServiceImpl("http://shelf.mo.sap.corp:8080/api/v1/cookbooks");
-			JenkinsService jenkinsService = new JenkinsServiceOffbytwoImpl();
+			String shelfUrl = System.getProperty("shelfUrl", "http://shelf.mo.sap.corp:8080/api/v1/cookbooks");
+			String files = System.getProperty("files", ".kitchen.yml,Cheffile");
+
+			String jenkinsUrl = System.getProperty("jenkinsUrl", "http://mo-26ab3d335.mo.sap.corp:8080/jenkins/");
+			String username = System.getProperty("username", "asa1_mocons1");
+			String token = System.getProperty("token", "1f3a52012d2c86baadf1af8658ae02e5");
+
+			CookbookService cookbookService = new CookbookServiceImpl(shelfUrl, files.split(","));
+			JenkinsService jenkinsService = new JenkinsServiceOffbytwoImpl(jenkinsUrl, username, token);
 
 			List<Cookbook> cookbooks = cookbookService.getCIQualifiedCookbooks();
-			jenkinsService.createJobs(cookbooks);
+			if (Boolean.getBoolean("createJob")) {
+				LOGGER.info("creating jenkins jobs");
+				jenkinsService.createJobs(cookbooks);
+			} else {
+				LOGGER.info("skip jenkins jobs creation, use '-DcreateJob' to enable");
+			}
 
 			LOGGER.info("Jenkins job provision - Complete");
 

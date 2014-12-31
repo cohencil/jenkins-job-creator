@@ -19,17 +19,15 @@ public class JenkinsServiceOffbytwoImpl implements JenkinsService {
 
 	private static Logger LOGGER = Logger.getLogger(JenkinsServiceOffbytwoImpl.class);
 
-	private static final String SERVER_URL = "http://mo-26ab3d335.mo.sap.corp:8080/jenkins/";
-	private static final String USERNAME = "asa1_mocons1";
-	private static final String TOKEN = "1f3a52012d2c86baadf1af8658ae02e5";
-
 	private JenkinsServer jenkinsServer;
 	private Document doc;
 
-	public JenkinsServiceOffbytwoImpl() {
+	public JenkinsServiceOffbytwoImpl(String url, String username, String token) {
+		LOGGER.debug(String.format("initialize JenkinsServiceOffbytwoImpl with url=%s, username=%s, token=%s", url,
+				username, token));
+
 		try {
-			// TODO externalize server_url
-			jenkinsServer = new JenkinsServer(new URI(SERVER_URL), USERNAME, TOKEN);
+			jenkinsServer = new JenkinsServer(new URI(url), username, token);
 			doc = new SAXReader().read(this.getClass().getResource("config.xml"));
 
 		} catch (Exception e) {

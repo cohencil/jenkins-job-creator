@@ -20,9 +20,13 @@ public class CookbookServiceImpl implements CookbookService {
 
 	private static final int CONNECTION_TIMEOUT = 5000;
 	private CookbookDao cookbookDao;
+	private String[] files;
 
-	public CookbookServiceImpl(String url) {
+	public CookbookServiceImpl(String url, String... files) {
+		LOGGER.debug(String.format("initialize CookbookServiceImpl with url=%s, files=%s", url, Arrays.toString(files)));
+
 		cookbookDao = new CookbookDaoJacksonImpl(url);
+		this.files = files;
 	}
 
 	@Override
@@ -47,9 +51,6 @@ public class CookbookServiceImpl implements CookbookService {
 	}
 
 	private boolean isQualified(String url) {
-		// TODO externalize files
-		List<String> files = Arrays.asList(".kitchen.yml", "Cheffile");
-
 		for (String file : files) {
 			String filePath = url.concat("/blob/master/").concat(file);
 			try {
