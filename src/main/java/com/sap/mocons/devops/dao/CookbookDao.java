@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.sap.mocons.devops.domain.Cookbook;
 
-public interface CookbookDao {
+public interface CookbookDao extends GenericDao<Cookbook> {
+
 	List<Cookbook> getCookbooks();
 }

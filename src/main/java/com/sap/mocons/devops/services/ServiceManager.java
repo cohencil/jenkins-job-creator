@@ -5,8 +5,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.sap.mocons.devops.domain.Cookbook;
-import com.sap.mocons.devops.services.impl.CookbookServiceImpl;
-import com.sap.mocons.devops.services.impl.JenkinsServiceOffbytwoImpl;
 
 public class ServiceManager {
 
@@ -23,8 +21,8 @@ public class ServiceManager {
 			String username = System.getProperty("username", "asa1_mocons1");
 			String token = System.getProperty("token", "1f3a52012d2c86baadf1af8658ae02e5");
 
-			CookbookService cookbookService = new CookbookServiceImpl(shelfUrl, files.split(","));
-			JenkinsService jenkinsService = new JenkinsServiceOffbytwoImpl(jenkinsUrl, username, token);
+			CookbookService cookbookService = new CookbookService(shelfUrl, files.split(","));
+			JenkinsService jenkinsService = new JenkinsService(jenkinsUrl, username, token);
 
 			List<Cookbook> cookbooks = cookbookService.getCIQualifiedCookbooks();
 			if (Boolean.getBoolean("createJob")) {
