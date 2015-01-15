@@ -20,18 +20,28 @@ public class JenkinsService {
 	private final Document doc;
 	private JenkinsDao jenkinsDao;
 
-	public JenkinsService(String jenkinsUrl, String username, String token) {
-		LOGGER.debug(String.format("initializing JenkinsService with url=%s, username=%s, token=%s", jenkinsUrl,
-				username, token));
-
-		jenkinsDao = new JenkinsDaoImpl(jenkinsUrl, username, token);
-
+	public JenkinsService() {
 		try {
 			doc = new SAXReader().read(this.getClass().getResource("config.xml"));
 
 		} catch (DocumentException e) {
 			throw new RuntimeException("failed to load config.xml", e);
 		}
+	}
+
+	public JenkinsService(String jenkinsUrl) {
+		this();
+
+		LOGGER.debug(String.format("initializing JenkinsService with url=%s", jenkinsUrl));
+		jenkinsDao = new JenkinsDaoImpl(jenkinsUrl);
+	}
+
+	public JenkinsService(String jenkinsUrl, String username, String token) {
+		this();
+
+		LOGGER.debug(String.format("initializing JenkinsService with url=%s, username=%s, token=%s", jenkinsUrl,
+				username, token));
+		jenkinsDao = new JenkinsDaoImpl(jenkinsUrl, username, token);
 	}
 
 	public int createJobs(List<Cookbook> cookbooks) {
