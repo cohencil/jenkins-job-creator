@@ -18,11 +18,9 @@ public class ServiceManager {
 			String files = System.getProperty("files", ".kitchen.yml,Cheffile");
 
 			String jenkinsUrl = System.getProperty("jenkinsUrl", "http://mo-26ab3d335.mo.sap.corp:8080/jenkins/");
-			String username = System.getProperty("username", "asa1_mocons1");
-			String token = System.getProperty("token", "1f3a52012d2c86baadf1af8658ae02e5");
 
 			CookbookService cookbookService = new CookbookService(shelfUrl, files.split(","));
-			JenkinsService jenkinsService = new JenkinsService(jenkinsUrl, username, token);
+			JenkinsService jenkinsService = new JenkinsService(jenkinsUrl);
 
 			List<Cookbook> cookbooks = cookbookService.getCIQualifiedCookbooks();
 			if (Boolean.getBoolean("createJob")) {

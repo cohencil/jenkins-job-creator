@@ -12,6 +12,15 @@ public class GenericDaoJenkinsImpl {
 
 	protected final JenkinsServer jenkinsServer;
 
+	public GenericDaoJenkinsImpl(String url) {
+		try {
+			jenkinsServer = new JenkinsServer(new URI(url));
+
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("failed to initialize jenkins server", e);
+		}
+	}
+
 	public GenericDaoJenkinsImpl(String url, String username, String token) {
 		try {
 			jenkinsServer = new JenkinsServer(new URI(url), username, token);
