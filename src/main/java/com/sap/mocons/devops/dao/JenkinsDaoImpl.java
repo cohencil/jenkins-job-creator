@@ -8,12 +8,8 @@ public class JenkinsDaoImpl extends GenericDaoJenkinsImpl implements JenkinsDao 
 
 	// private static Logger LOGGER = Logger.getLogger(JenkinsDaoImpl.class);
 
-	public JenkinsDaoImpl(String url) {
-		super(url);
-	}
-
 	public JenkinsDaoImpl(String url, String username, String token) {
-		super(url);
+		super(url, username, token);
 	}
 
 	@Override
