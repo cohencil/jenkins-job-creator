@@ -30,22 +30,35 @@ public class CookbookService {
 
 	public List<Cookbook> getCIQualifiedCookbooks() {
 		List<Cookbook> qualifiedCookbooks = new ArrayList<Cookbook>();
+		List<Cookbook> unqualifiedCookbooks = new ArrayList<Cookbook>();
 
 		List<Cookbook> cookbooks = cookbookDao.getCookbooks();
 		for (Cookbook cookbook : cookbooks) {
 			String url = cookbook.getExternal_url();
 			if (url != null && !url.isEmpty()) {
-				LOGGER.info(String.format("process repository '%s': %s", cookbook.getName(), url));
+				LOGGER.info(String.format("process repository: '%s', %s", cookbook.getName(), url));
 				if (isQualified(url)) {
 					qualifiedCookbooks.add(cookbook);
+				} else {
+					unqualifiedCookbooks.add(cookbook);
 				}
 			}
 		}
+
+		logCookbooks(qualifiedCookbooks, "qualified");
+		logCookbooks(unqualifiedCookbooks, "unqualified");
 
 		LOGGER.info(String.format("%d / %d ci-qualified cookbooks were found", qualifiedCookbooks.size(),
 				cookbooks.size()));
 
 		return qualifiedCookbooks;
+	}
+
+	private void logCookbooks(List<Cookbook> cookbooks, String status) {
+		LOGGER.info(String.format("[%d] %s cookbooks were found", cookbooks.size(), status));
+		for (Cookbook cookbook : cookbooks) {
+			LOGGER.info(String.format("%s cookbook: '%s', %s", status, cookbook.getName(), cookbook.getExternal_url()));
+		}
 	}
 
 	private boolean isQualified(String url) {
@@ -56,16 +69,12 @@ public class CookbookService {
 				con.setRequestMethod("HEAD");
 				con.setConnectTimeout(CONNECTION_TIMEOUT);
 				if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
-					LOGGER.warn(String.format("[UNQUALIFIED] - unqualified repository: '%s'", url));
-
 					return false;
 				}
 			} catch (IOException e) {
 				LOGGER.error(String.format("failed to qualify url: '%s'", url), e);
 			}
 		}
-
-		LOGGER.info(String.format("[QUALIFIED] - qualified repository: '%s'", url));
 
 		return true;
 	}

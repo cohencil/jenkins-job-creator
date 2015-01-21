@@ -8,5 +8,5 @@ public interface JenkinsDao {
 
 	Map<String, Job> getJobs();
 
-	void createJob(String jobName, String gitRepositoryUrl);
+	void createJob(String jobName, String jobXml);
 }
