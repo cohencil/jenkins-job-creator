@@ -1,9 +1,12 @@
 package com.sap.mocons.devops.services;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.offbytwo.jenkins.model.Job;
 import com.sap.mocons.devops.domain.Cookbook;
 
 public class ServiceManager {
@@ -24,10 +27,34 @@ public class ServiceManager {
 			CookbookService cookbookService = new CookbookService(shelfUrl, files.split(","));
 			JenkinsService jenkinsService = new JenkinsService(jenkinsUrl, username, token);
 
-			List<Cookbook> cookbooks = cookbookService.getCIQualifiedCookbooks();
+			// get all existing jobs
+			Map<String, Job> jobs = jenkinsService.getJobs();
+
+			// get all cookbooks
+			List<Cookbook> cookbooks = cookbookService.getCookbooks();
+
+			// remove existing cookbooks in jenkins
+			List<Cookbook> existCookbooks = new ArrayList<>();
+			for (Cookbook cookbook : cookbooks) {
+				if (jobs.containsKey(cookbook.getName())) {
+					existCookbooks.add(cookbook);
+				}
+			}
+			cookbooks.removeAll(existCookbooks);
+			LOGGER.info(String.format("[%d] cookbooks were already added to jenkins", existCookbooks.size()));
+
+			// get qualified cookbooks
+			cookbooks = cookbookService.getQualifiedCookbooks(cookbooks);
+
+			// add job for qualified cookbook
 			if (Boolean.getBoolean("createJob")) {
-				LOGGER.info("creating jenkins jobs");
-				jenkinsService.createJobs(cookbooks);
+				if (cookbooks.size() == 0) {
+					LOGGER.info("no new cookbooks were found");
+				} else {
+					LOGGER.info("creating jenkins jobs...");
+					jenkinsService.createJobs(cookbooks);
+				}
+
 			} else {
 				LOGGER.info("skip jenkins jobs creation, use '-DcreateJob' to enable");
 			}

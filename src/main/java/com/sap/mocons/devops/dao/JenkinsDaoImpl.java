@@ -15,6 +15,10 @@ public class JenkinsDaoImpl implements JenkinsDao {
 	protected final JenkinsServer jenkinsServer;
 
 	public JenkinsDaoImpl(String url, String username, String token) {
+		if (token == null || token.isEmpty()) {
+			throw new IllegalArgumentException("please set token");
+		}
+
 		try {
 			jenkinsServer = new JenkinsServer(new URI(url), username, token);
 
@@ -28,6 +32,7 @@ public class JenkinsDaoImpl implements JenkinsDao {
 
 		try {
 			jobs = jenkinsServer.getJobs();
+
 		} catch (IOException e) {
 			throw new RuntimeException("failed to get jobs", e);
 		}

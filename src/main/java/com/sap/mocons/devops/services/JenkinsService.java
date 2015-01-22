@@ -37,23 +37,18 @@ public class JenkinsService {
 	public int createJobs(List<Cookbook> cookbooks) {
 		int createdJobs = 0;
 
-		Map<String, Job> jobs = jenkinsDao.getJobs();
-
 		for (Cookbook cookbook : cookbooks) {
-			String jobName = cookbook.getName();
-			if (!jobs.keySet().contains(jobName)) {
-				// add non-existing jobs
+			String cookbookName = cookbook.getName();
 
-				LOGGER.info(String.format("adding new jenkins job: %s", cookbook));
+			LOGGER.info(String.format("adding new jenkins job for cookbook: '%s'", cookbookName));
 
-				setGitRepositoryUrl(cookbook.getGitRepositoryUrl());
-				jenkinsDao.createJob(jobName, doc.asXML());
-				createdJobs++;
+			setGitRepositoryUrl(cookbook.getGitRepositoryUrl());
+			jenkinsDao.createJob(cookbookName, doc.asXML());
+			createdJobs++;
 
-				LOGGER.info(String.format("new job was added to jenkins: %s", jobName));
-			}
+			LOGGER.info(String.format("new job was added to jenkins: '%s'", cookbookName));
 		}
-		LOGGER.info(String.format("%d new jobs were added to jenkins", createdJobs));
+		LOGGER.info(String.format("[%d] new jobs were added to jenkins", createdJobs));
 
 		return createdJobs;
 	}
@@ -61,5 +56,12 @@ public class JenkinsService {
 	private void setGitRepositoryUrl(String gitUrl) {
 		Node node = doc.selectSingleNode("//hudson.plugins.git.UserRemoteConfig/url");
 		node.setText(gitUrl);
+	}
+
+	public Map<String, Job> getJobs() {
+		Map<String, Job> jobs = jenkinsDao.getJobs();
+		LOGGER.info(String.format("[%d] jenkins jobs were loaded", jobs.size()));
+
+		return jobs;
 	}
 }

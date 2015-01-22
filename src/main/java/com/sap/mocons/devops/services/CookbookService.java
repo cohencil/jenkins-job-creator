@@ -28,28 +28,42 @@ public class CookbookService {
 		this.files = files;
 	}
 
-	public List<Cookbook> getCIQualifiedCookbooks() {
-		List<Cookbook> qualifiedCookbooks = new ArrayList<Cookbook>();
-		List<Cookbook> unqualifiedCookbooks = new ArrayList<Cookbook>();
-
+	public List<Cookbook> getCookbooks() {
 		List<Cookbook> cookbooks = cookbookDao.getCookbooks();
+		LOGGER.info(String.format("[%d] cookbooks were loaded", cookbooks.size()));
+
+		return cookbooks;
+	}
+
+	public List<Cookbook> getQualifiedCookbooks(List<Cookbook> cookbooks) {
+
+		List<Cookbook> qualifiedCookbooks = new ArrayList<>();
+		List<Cookbook> unqualifiedCookbooks = new ArrayList<>();
+		List<Cookbook> failedCookbooks = new ArrayList<>();
+
 		for (Cookbook cookbook : cookbooks) {
 			String url = cookbook.getExternal_url();
+			String name = cookbook.getName();
+
+			LOGGER.info(String.format("process repository: '%s', %s", name, url));
+
 			if (url != null && !url.isEmpty()) {
-				LOGGER.info(String.format("process repository: '%s', %s", cookbook.getName(), url));
 				if (isQualified(url)) {
 					qualifiedCookbooks.add(cookbook);
 				} else {
 					unqualifiedCookbooks.add(cookbook);
 				}
+			} else {
+				failedCookbooks.add(cookbook);
 			}
 		}
 
 		logCookbooks(qualifiedCookbooks, "qualified");
 		logCookbooks(unqualifiedCookbooks, "unqualified");
+		logCookbooks(failedCookbooks, "failed");
 
-		LOGGER.info(String.format("%d / %d ci-qualified cookbooks were found", qualifiedCookbooks.size(),
-				cookbooks.size()));
+		LOGGER.info(String.format("summary: [%d / %d / %d] (qualified / failed / available)",
+				qualifiedCookbooks.size(), failedCookbooks.size(), cookbooks.size()));
 
 		return qualifiedCookbooks;
 	}
